@@ -1,18 +1,22 @@
 import {Request, Response} from 'express';
+import validUrl from 'valid-url';
 
-import Database from '../database/config';
+import videoModel from '../model/Video';
 
 class VideosController {
     static async index(request: Request, response: Response){
-        const db = await Database();
-        const videos = await db.all(`SELECT * FROM videos`);
+        const videos = await videoModel.getAllVideos();
+        
         return response.status(200).send(videos);
     }
 
     static async filterVideo(request: Request, response: Response){
         const {id} = request.params;
-        const db = await Database();
-        const video = await db.get(`SELECT * FROM videos WHERE id = ${id}`);
+
+        if(!id)
+            return response.status(400).send({message: 'please provide a video id'});
+
+        const video = await videoModel.index(id);
 
         if(video){
             return response.status(200).send(video);
@@ -22,14 +26,24 @@ class VideosController {
     }
 
     static async create(request: Request, response: Response){
-        const db = await Database();
         const {
             title,
             description,
             url
         } = request.body;
 
-        const {lastID: id} = await db.run(`INSERT INTO videos (title, description, url) VALUES ('${title}', '${description}', '${url}')`);
+        if(!title || !description || !url)
+            return response.status(400).send({message: 'please do not leave any empty field'});
+
+        if(!validUrl.isUri(url)){
+            return response.status(400).send({message: 'please provide a valid URL'});
+        }
+        
+        if(title.length > 30)
+            return response.status(400).send({message: 'limit of characters for title field is 30'});
+
+
+        const id = await videoModel.insert(request.body);
 
 
         return response.status(201).send({id, title, description, url});
@@ -37,9 +51,11 @@ class VideosController {
 
     static async delete(request: Request, response: Response) {
         const {id} = request.params;
-        const db = await Database();
 
-        const {changes} = await db.run(`DELETE FROM videos WHERE id = ${id}`);
+        if(!id)
+            return response.status(400).send({message: 'please provide a video id'})
+
+        const changes = await videoModel.delete(id);
 
         if (changes != 0){
             return response.status(200).send({message: 'video deleted'});
@@ -50,24 +66,23 @@ class VideosController {
     }
 
     static async update(request:Request, response:Response) {
-        const {id, title, description, url} = request.body;
-        const db = await Database();
-
+        const {id, url} = request.body;
+        
         if(!id)
             return response.status(400).send({message: 'please provide a video id'});
-
-        const videoData = await db.get(`SELECT * FROM videos WHERE id = ${id}`);
+        
+        if(!validUrl.isUri(url)){
+            return response.status(400).send({message: 'please provide a valid URL'});
+        }
+        
+        const videoData = await videoModel.index(id);
 
         if(!videoData){
             return response.status(400).send({message: 'cannot find video with requested id'})
         }
 
+        videoModel.update(request.body, videoData);
 
-        await db.run(`UPDATE videos SET 
-                        title = '${title?title:videoData.title}',
-                        description = '${description?description:videoData.description}',
-                        url = '${url?url:videoData.url}'
-                     WHERE id = ${id}`);
 
         return response.status(201).send({message: 'resource updated'});
     }
