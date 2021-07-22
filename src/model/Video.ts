@@ -10,7 +10,7 @@ interface Video {
 
 class Video {
 
-    async insert(video: Video){
+    static async insert(video: Video){
         const db = await Database();
 
         const {
@@ -20,45 +20,59 @@ class Video {
         } = video;
 
         const { lastID: id } = await db.run(`INSERT INTO videos (title, description, url) VALUES ('${title}', '${description}', '${url}')`);
+        await db.close();
+
         return id;
     }
 
-    async delete(id: string ){
+    static async delete(id: string ){
         const db = await Database();
 
         const {changes} = await db.run(`DELETE FROM videos WHERE id = ${id}`);
 
+        await db.close();
+
         return changes;
     }
 
-    async index(id: string){
+    static async index(id: string){
         const db = await Database();
 
         const videoData = await db.get(`SELECT * FROM videos WHERE id = ${id}`);
 
+        await db.close();
+
         return videoData;
     }
 
-    async getAllVideos(){
+    static async getAllVideos(){
         const db = await Database();
 
         const videos = await db.all(`SELECT * FROM videos`);
 
+        await db.close();
+
         return videos;
     }
 
-    async update(video: Video, videoData: Video){
+    static async update(video: Video, videoData: Video){
         const db = await Database();
 
-        const {title, description, url, id} = video
+        const {title, description, url, id} = video;
+
+        console.log('id: '+ id);
 
         await db.run(`UPDATE videos SET 
                         title = '${title?title:videoData.title}',
                         description = '${description?description:videoData.description}',
                         url = '${url?url:videoData.url}'
                      WHERE id = ${id}`);
+
+
+        await db.close();
+        
     }
 
 }
 
-export default new Video();
+export default Video;

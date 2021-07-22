@@ -10,8 +10,8 @@ routes.post('/videos', VideosController.create);
 
 routes.delete('/videos/:id', VideosController.delete);
 
-routes.put('/videos', VideosController.update);
-routes.patch('/videos', VideosController.update);
+routes.put('/videos/:id', VideosController.update);
+routes.patch('/videos/:id', VideosController.update);
 
 
 export default routes;

@@ -66,12 +66,10 @@ class VideosController {
     }
 
     static async update(request:Request, response:Response) {
-        const {id, url} = request.body;
+        const {id} = request.params;
+        const {url} = request.body;
         
-        if(!id)
-            return response.status(400).send({message: 'please provide a video id'});
-        
-        if(!validUrl.isUri(url)){
+        if(url !== undefined && !validUrl.isUri(url)){
             return response.status(400).send({message: 'please provide a valid URL'});
         }
         
@@ -81,7 +79,7 @@ class VideosController {
             return response.status(400).send({message: 'cannot find video with requested id'})
         }
 
-        videoModel.update(request.body, videoData);
+        videoModel.update({...request.body, id}, videoData);
 
 
         return response.status(201).send({message: 'resource updated'});
