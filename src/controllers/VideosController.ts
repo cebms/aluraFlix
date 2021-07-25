@@ -1,6 +1,6 @@
 import {Request, Response} from 'express';
-import validUrl from 'valid-url';
 
+import Validations from '../utils/validations'
 import videoModel from '../model/Video';
 
 class VideosController {
@@ -13,16 +13,15 @@ class VideosController {
     static async filterVideo(request: Request, response: Response){
         const {id} = request.params;
 
-        if(!id)
-            return response.status(400).send({message: 'please provide a video id'});
+        if(Validations.validateFilter(id, response)){
+            const video = await videoModel.index(id);
 
-        const video = await videoModel.index(id);
-
-        if(video){
-            return response.status(200).send(video);
-        } else {
-            return response.status(404).send({message: "video not found"});
-        }
+            if(video){
+                return response.status(200).send(video);
+            } else {
+                return response.status(404).send({message: "video not found"});
+            }
+        }        
     }
 
     static async create(request: Request, response: Response){
@@ -32,36 +31,26 @@ class VideosController {
             url
         } = request.body;
 
-        if(!title || !description || !url)
-            return response.status(400).send({message: 'please do not leave any empty field'});
-
-        if(!validUrl.isUri(url)){
-            return response.status(400).send({message: 'please provide a valid URL'});
+        if(Validations.validateCreate(request.body, response)){
+            const id = await videoModel.insert(request.body);
+            return response.status(201).send({id, title, description, url});
         }
         
-        if(title.length > 30)
-            return response.status(400).send({message: 'limit of characters for title field is 30'});
-
-
-        const id = await videoModel.insert(request.body);
-
-
-        return response.status(201).send({id, title, description, url});
     }
 
     static async delete(request: Request, response: Response) {
         const {id} = request.params;
 
-        if(!id)
-            return response.status(400).send({message: 'please provide a video id'})
-
-        const changes = await videoModel.delete(id);
-
-        if (changes != 0){
-            return response.status(200).send({message: 'video deleted'});
-        } else {
-            return response.status(400).send({message: 'cannot find video with requested id'});
+        if(Validations.validateDelete(id, response)){
+            const changes = await videoModel.delete(id);
+    
+            if (changes != 0){
+                return response.status(200).send({message: 'video deleted'});
+            } else {
+                return response.status(400).send({message: 'cannot find video with requested id'});
+            }
         }
+
 
     }
 
@@ -69,20 +58,18 @@ class VideosController {
         const {id} = request.params;
         const {url} = request.body;
         
-        if(url !== undefined && !validUrl.isUri(url)){
-            return response.status(400).send({message: 'please provide a valid URL'});
+        if(Validations.validateUpdate(url, response)){
+            const videoData = await videoModel.index(id);
+    
+            if(!videoData){
+                return response.status(400).send({message: 'cannot find video with requested id'})
+            }
+    
+            videoModel.update({...request.body, id}, videoData);
+
+            return response.status(201).send({message: 'resource updated'});
         }
         
-        const videoData = await videoModel.index(id);
-
-        if(!videoData){
-            return response.status(400).send({message: 'cannot find video with requested id'})
-        }
-
-        videoModel.update({...request.body, id}, videoData);
-
-
-        return response.status(201).send({message: 'resource updated'});
     }
 }
 

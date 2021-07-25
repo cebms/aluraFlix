@@ -6,9 +6,9 @@ const initDb = {
 
         await db.exec(`CREATE TABLE videos (
             id INTEGER PRIMARY KEY,
-            title TEXT,
-            description TEXT,
-            url TEXT
+            title VARCHAR(100) NOT NULL,
+            description TEXT NOT NULL,
+            url TEXT NOT NULL
         )`);
         
         await db.close();
