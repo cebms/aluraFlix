@@ -4,7 +4,8 @@ interface Video {
     id?: string
     title: string,
     description: string,
-    url: string
+    url: string,
+    category: string
 }
 
 
@@ -16,10 +17,22 @@ class Video {
         const {
             title,
             description,
-            url
+            url,
+            category
         } = video;
 
-        const { lastID: id } = await db.run(`INSERT INTO videos (title, description, url) VALUES ('${title}', '${description}', '${url}')`);
+        const { lastID: id } = await db.run(`INSERT INTO videos (
+            title,
+            description,
+            url,
+            category
+            ) VALUES (
+            '${title}',
+            '${description}',
+            '${url}',
+            ${category?`'${category}'`:1})
+            `);
+            
         await db.close();
 
         return id;
@@ -60,8 +73,6 @@ class Video {
 
         const {title, description, url, id} = video;
 
-        console.log('id: '+ id);
-
         await db.run(`UPDATE videos SET 
                         title = '${title?title:videoData.title}',
                         description = '${description?description:videoData.description}',
@@ -71,6 +82,19 @@ class Video {
 
         await db.close();
         
+    }
+
+    static async categoryExists(category: string){
+        const db = await Database();
+
+        const availableCategory = await db.get(`SELECT * FROM categories WHERE id = ${category}`);
+
+
+        if(availableCategory === undefined){
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }
