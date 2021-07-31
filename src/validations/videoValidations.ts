@@ -25,13 +25,11 @@ class Validations {
     static validateFilter(id: string){
 
         if(!this.validateId(id)){
-            return {message: "Id parameter must be a number"};
+            throw new Error('Id parameter must be a number');
         }
 
         if(!id){
-            return {message: 'please provide a video id'};
-        } else {
-            return true;
+            throw new Error('please provide a video id');
         }
     }
 
@@ -47,44 +45,40 @@ class Validations {
         const onlySpacesDescription = description.trim().length === 0;
 
         if(onlySpacesTitle || onlySpacesDescription){
-            return {message: 'please input a valid title and description'};
+            throw new Error('please input a valid title and description'); 
         }
 
         if(!title || !description || !url){
-            return {message: 'please do not leave any empty field'};
+            throw new Error('please do not leave any empty field'); 
         }
 
         if(!validUrl.isUri(url)){
-            return {message: 'please provide a valid URL'};
+            throw new Error('please provide a valid URL'); 
         }
         
         if(title.length > 100){
-            return {message: 'limit of characters for title field is 100'};
+            throw new Error('limit of characters for title field is 100'); 
         }
 
         if(category && (!this.validateId(category) || category.trim() == '')){
-            return {message: 'category data is invalid'};
+            throw new Error('category data is invalid');
         }
 
         if(category && await videoModel.categoryExists(category) === false){
-            return {message: 'category does not exist. Did you create it?'};
+            throw new Error('category does not exist. Did you create it?');
         }
 
-        return true;
     }
 
     static validateDelete(id: string){
 
         if(!this.validateId(id)){
-            return {message: "Id parameter must be a number"};
+            throw new Error('id parameter must be a number');
         }
 
         if(!id){
-            return {message: 'please provide a video id'};
-        } else {
-            return true;
-        }
-        
+            throw new Error('please provide a video id');
+        }         
     }
 
     static validateUpdate(video: Video){
@@ -96,7 +90,8 @@ class Validations {
         } = video;
 
         if(!this.validateId(id)){
-            return {message: "Id parameter must be a number"};
+            // return {message: "Id parameter must be a number"};
+            throw new Error("Id parameter must be a number");
         }
 
         let onlySpacesTitle = false;
@@ -112,13 +107,14 @@ class Validations {
         }
 
         if(onlySpacesTitle || onlySpacesDescription){
-            return {message: 'please input a valid title and description'};
+            // return {message: 'please input a valid title and description'};
+            throw new Error('please input a valid title and description');
         }
 
         if(url !== undefined && !validUrl.isUri(url)){
-            return {message: 'please provide a valid URL'};
-        } else {
-            return true;
+            // return {message: 'please provide a valid URL'};
+            throw new Error('please provide a valid URL');
+
         }
     }
 }

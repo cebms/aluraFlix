@@ -15,9 +15,9 @@ class VideosController {
     static async filterVideo(request: Request, response: Response){
         const {id} = request.params;
 
-        const isValid = Validations.validateFilter(id);
+        try {
+            Validations.validateFilter(id);
 
-        if(isValid === true){
             const video = await videoModel.index(id);
 
             if(video){
@@ -25,8 +25,9 @@ class VideosController {
             } else {
                 return response.status(404).json({message: "video not found"});
             }
-        } else {
-            return response.status(400).json(isValid);
+
+        } catch (error) {
+            response.status(400).json({message: error.message});
         }
     }
 
@@ -38,13 +39,12 @@ class VideosController {
             category
         } = request.body;
 
-        const isValid = await Validations.validateCreate(request.body);
-
-        if(isValid === true){
+        try {
+            await Validations.validateCreate(request.body);
             const id = await videoModel.insert(request.body);
             return response.status(201).json({id, title, description, url, category});
-        } else {
-            return response.status(400).json(isValid);
+        } catch (error) {
+            response.status(400).json({message: error.message});
         }
         
     }
@@ -52,9 +52,9 @@ class VideosController {
     static async delete(request: Request, response: Response) {
         const {id} = request.params;
 
-        const isValid = Validations.validateDelete(id)
+        try {
+            Validations.validateDelete(id);
 
-        if(isValid === true){
             const changes = await videoModel.delete(id);
     
             if (changes != 0){
@@ -62,8 +62,8 @@ class VideosController {
             } else {
                 return response.status(400).json({message: 'cannot find video with requested id'});
             }
-        } else {
-            return response.status(400).json(isValid);
+        } catch (error) {
+            return response.status(400).json({message: error.message});
         }
 
 
@@ -72,9 +72,9 @@ class VideosController {
     static async update(request:Request, response:Response) {
         const {id} = request.params;
 
-        const isValid = Validations.validateUpdate({...request.body, id});
+        try {
+            Validations.validateUpdate({...request.body, id});
 
-        if(isValid === true){
             const videoData = await videoModel.index(id);
     
             if(!videoData){
@@ -84,9 +84,8 @@ class VideosController {
             videoModel.update({...request.body, id}, videoData);
 
             return response.status(201).json({message: 'resource updated'});
-
-        } else {
-            return response.status(400).json(isValid);
+        } catch (error) {
+            response.status(400).json({message: error.message});
         }
         
     }

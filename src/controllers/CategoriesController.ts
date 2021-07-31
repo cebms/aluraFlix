@@ -3,19 +3,18 @@ import {Request, Response} from 'express';
 import categoryModel from '../model/Category';
 import Validations from '../validations/categoriesValidations';
 
+
 class CategoriesController {
     static async create(request: Request, response: Response){
         const { title, color } = request.body;
 
-        const isValid = Validations.validateCreate(request.body);
-        
-        if(isValid === true){
+        try {
+            Validations.validateCreate(request.body);
             const id = await categoryModel.insert(request.body);
             return response.status(201).json({id, title, color});
-        } else {
-            return response.status(400).json(isValid);
+        } catch (error) {
+            response.status(400).json({message: error.message});
         }
-
     }
 
     static async index(request: Request, response: Response){
@@ -27,9 +26,9 @@ class CategoriesController {
     static async filterCategory(request: Request, response: Response){
         const { id } = request.params;
 
-        const isValid = Validations.validateFilter(id);
-        
-        if(isValid === true){
+        try {
+            Validations.validateFilter(id);
+
             const category = await categoryModel.index(id);
     
             if(category){
@@ -37,8 +36,8 @@ class CategoriesController {
             } else {
                 return response.status(404).json({message: "category not found"});
             }
-        } else {
-            return response.status(400).json(isValid);
+        } catch (error) {
+            response.status(400).json({message: error.message});
         }
 
     }
@@ -46,9 +45,9 @@ class CategoriesController {
     static async delete(request: Request, response: Response){
         const {id} = request.params;
 
-        const isValid = Validations.validateDelete(id);
+        try {
+            Validations.validateDelete(id);
 
-        if(isValid === true){
             const changes = await categoryModel.delete(id);
 
             if (changes != 0){
@@ -56,17 +55,17 @@ class CategoriesController {
             } else {
                 return response.status(400).json({message: 'cannot find category with requested id'});
             }
-        } else {
-            return response.status(400).json(isValid);
+        } catch (error) {
+            response.status(400).json({message: error.message});
         }
     }
 
     static async update(request: Request, response: Response){
         const {id} = request.params;
 
-        const isValid = Validations.validateUpdate({...request.body, id});
-        
-        if(isValid === true){
+        try {
+            Validations.validateUpdate({...request.body, id});
+
             const categoryData = await categoryModel.index(id);
     
             if(!categoryData){
@@ -76,8 +75,8 @@ class CategoriesController {
             categoryModel.update({...request.body, id}, categoryData);
 
             return response.status(201).json({message: 'resource updated'});
-        } else {
-            return response.status(400).json(isValid);
+        } catch (error) {
+            response.status(400).json({message: error.message});
         }
     }
 

@@ -26,6 +26,7 @@ class Validations {
         return true;
     }
 
+    //ok
     static validateCreate(category: Category){
         const { title, color } = category;
 
@@ -33,53 +34,50 @@ class Validations {
 
 
         if(!title || !color){
-            return {message: 'please do not leave any empty field'};
+            throw new Error('please do not leave any empty field');
         }
 
         if(color.indexOf('#') != 0){
-            return {message: 'please make sure the color code is preceded by \'#\''};
+            throw new Error('please make sure the color code is preceded by \'#\'');
         }
 
         const isHexColor = this.isHexColor(color);
 
         if(!isHexColor){
-            return {message: 'invalid color code!'};
+            throw new Error('invalid color code!');
         }
 
         if(onlySpacesTitle){
-            return {message: 'please input a valid title'};
+            throw new Error('please input a valid title');
         }
 
 
         if(title.length > 20){
-            return {message: 'limit of characters for title field is 20'};
-        }
+            throw new Error('limit of characters for title field is 20');
 
-        return true;
+        }
     }
 
+    //ok
     static validateFilter(id: string){
 
         if(!this.validateId(id)){
-            return {message: "Id parameter must be a number"};
+            throw new Error("Id parameter must be a number");
         }
 
         if(!id){
-            return {message: 'please provide a category id'};
-        } else {
-            return true;
+            throw new Error('please provide a category id');
         }
     }
 
+    //ok
     static validateDelete(id: string){
         if(!this.validateId(id)){
-            return {message: "Id parameter must be a number"};
+            throw new Error("Id parameter must be a number");
         }
 
         if(!id){
-            return {message: 'please provide a category id'};
-        } else {
-            return true;
+            throw new Error('please provide a category id');
         }
     }
 
@@ -87,29 +85,30 @@ class Validations {
         const { title, color, id } = category;
 
         if(!this.validateId(id)){
-            return {message: "Id parameter must be a number"};
+            throw new Error("Id parameter must be a number");
         }
 
         if(color){
+            if(color.indexOf('#') != 0){
+                throw new Error('please make sure the color code is preceded by \'#\'');
+            }
             const isHexColor = this.isHexColor(color);
             if(!isHexColor){
-                return {message: 'invalid color code!'};
+                throw new Error('invalid color code!');
             }
         }
 
         if(title){
             const onlySpacesTitle = title.trim().length === 0;
             if(onlySpacesTitle){
-                return {message: 'please input a valid title'};
+                throw new Error('please input a valid title');
             }
 
             if(title.length > 20){
-                return {message: 'limit of characters for title field is 20'};
+                throw new Error('limit of characters for title field is 20');
             }
         }
 
-
-        return true;
     }
 }
 
