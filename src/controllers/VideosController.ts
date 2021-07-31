@@ -5,7 +5,9 @@ import videoModel from '../model/Video';
 
 class VideosController {
     static async index(request: Request, response: Response){
-        const videos = await videoModel.getAllVideos();
+        const { search } = request.query;
+
+        const videos = await videoModel.getAllVideos(search);
         
         return response.status(200).json(videos);
     }

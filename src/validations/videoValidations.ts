@@ -62,11 +62,11 @@ class Validations {
             return {message: 'limit of characters for title field is 100'};
         }
 
-        if(category !== undefined && (!this.validateId(category) || category.trim() == '')){
+        if(category && (!this.validateId(category) || category.trim() == '')){
             return {message: 'category data is invalid'};
         }
 
-        if(await videoModel.categoryExists(category) === false){
+        if(category && await videoModel.categoryExists(category) === false){
             return {message: 'category does not exist. Did you create it?'};
         }
 

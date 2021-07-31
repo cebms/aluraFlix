@@ -20,6 +20,11 @@ const initDb = {
             FOREIGN KEY(category) REFERENCES categories(id)
         )`);
 
+        await db.run(`INSERT INTO categories 
+                (title, color
+                ) VALUES ('livre', 
+                '#FFFFFF')`);
+
             await db.close();
     }
     

@@ -58,14 +58,23 @@ class Video {
         return videoData;
     }
 
-    static async getAllVideos(){
+    static async getAllVideos(searchTerm: any){
         const db = await Database();
 
-        const videos = await db.all(`SELECT * FROM videos`);
 
-        await db.close();
+        if(!searchTerm){
+            const videos = await db.all(`SELECT * FROM videos`);
+            await db.close();
+            return videos;
+        } else {
+            const videos = await db.all(`SELECT * FROM videos WHERE title LIKE '%${searchTerm}%'`);
+            await db.close();
+            return videos;
+        }
 
-        return videos;
+
+
+
     }
 
     static async update(video: Video, videoData: Video){
