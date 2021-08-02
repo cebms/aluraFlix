@@ -22,6 +22,19 @@ class Validations {
         return newString.length===0?true:false;
     }
 
+    static validatePage(page: any){
+        if(!page || page === '0'){
+            page = '1';
+        
+        }
+        if(!this.validateId(page)){
+            throw new Error('Page parameter must be a number');
+        }
+
+        return parseInt(page);
+
+    }
+
     static validateFilter(id: string){
 
         if(!this.validateId(id)){

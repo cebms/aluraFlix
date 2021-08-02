@@ -18,9 +18,16 @@ class CategoriesController {
     }
 
     static async index(request: Request, response: Response){
-        const categories = await categoryModel.getAllCategories();
+        const { page } = request.query;
 
-        return response.status(200).json(categories);
+        try {
+            const validatedPage = Validations.validatePage(page);
+            const offset = (validatedPage - 1) * 5;
+            const categories = await categoryModel.getAllCategories(offset);
+            return response.status(200).json(categories);
+        } catch (error) {
+            response.status(400).json({message: error.message});
+        }
     }
 
     static async filterCategory(request: Request, response: Response){

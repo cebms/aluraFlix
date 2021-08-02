@@ -51,6 +51,12 @@ class Video {
     static async index(id: string){
         const db = await Database();
 
+        if(id === 'free'){
+            const videoData = await db.all(`SELECT * FROM videos LIMIT 5 OFFSET 0`);
+            await db.close();
+            return videoData;
+        }
+
         const videoData = await db.get(`SELECT * FROM videos WHERE id = ${id}`);
 
         await db.close();
@@ -58,16 +64,16 @@ class Video {
         return videoData;
     }
 
-    static async getAllVideos(searchTerm: any){
+    static async getAllVideos(searchTerm: any, offset: number){
         const db = await Database();
 
 
         if(!searchTerm){
-            const videos = await db.all(`SELECT * FROM videos`);
+            const videos = await db.all(`SELECT * FROM videos LIMIT 5 OFFSET ${offset}`);
             await db.close();
             return videos;
         } else {
-            const videos = await db.all(`SELECT * FROM videos WHERE title LIKE '%${searchTerm}%'`);
+            const videos = await db.all(`SELECT * FROM videos WHERE title LIKE '%${searchTerm}%' LIMIT 5 OFFSET ${offset}`);
             await db.close();
             return videos;
         }
@@ -75,6 +81,16 @@ class Video {
 
 
 
+    }
+
+    static async getFreeVideos(){
+        const db = await Database();
+
+        const videos = await db.all(`SELECT * FROM videos LIMIT 5`);
+
+        await db.close;
+
+        return videos;
     }
 
     static async update(video: Video, videoData: Video){

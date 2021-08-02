@@ -5,10 +5,23 @@ import videoModel from '../model/Video';
 
 class VideosController {
     static async index(request: Request, response: Response){
-        const { search } = request.query;
+        const { search, page } = request.query;
 
-        const videos = await videoModel.getAllVideos(search);
+        try {
+            const validatedPage = Validations.validatePage(page);
+            const offset = (validatedPage - 1) * 5;
+            const videos = await videoModel.getAllVideos(search, offset);
+            return response.status(200).json(videos); 
+        } catch (error) {
+            response.status(400).json({message: error.message});
+        }
+
         
+    }
+
+    static async freeVideosIndex(request: Request, response: Response){
+        const videos = await videoModel.getFreeVideos();
+
         return response.status(200).json(videos);
     }
 
@@ -16,8 +29,10 @@ class VideosController {
         const {id} = request.params;
 
         try {
+            if(id === 'free'){
+                return response.redirect('http://localhost:3333/freeVideos');
+            }
             Validations.validateFilter(id);
-
             const video = await videoModel.index(id);
 
             if(video){

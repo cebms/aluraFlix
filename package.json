@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
+    "express-basic-auth": "^1.2.0",
     "sqlite": "^4.0.23",
     "sqlite3": "^5.0.2",
     "valid-url": "^1.0.9"

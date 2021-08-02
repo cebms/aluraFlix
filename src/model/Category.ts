@@ -18,10 +18,10 @@ class Category {
         return id;
     }
 
-    static async getAllCategories(){
+    static async getAllCategories(offset: number){
         const db = await Database();
 
-        const videos = await db.all(`SELECT * FROM categories`);
+        const videos = await db.all(`SELECT * FROM categories LIMIT 5 OFFSET ${offset}`);
 
         await db.close();
 

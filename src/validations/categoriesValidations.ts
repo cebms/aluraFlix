@@ -26,7 +26,19 @@ class Validations {
         return true;
     }
 
-    //ok
+    static validatePage(page: any){
+        if(!page || page === '0'){
+            page = '1';
+        
+        }
+        if(!this.validateId(page)){
+            throw new Error('Page parameter must be a number');
+        }
+
+        return parseInt(page);
+
+    }
+
     static validateCreate(category: Category){
         const { title, color } = category;
 
@@ -58,7 +70,6 @@ class Validations {
         }
     }
 
-    //ok
     static validateFilter(id: string){
 
         if(!this.validateId(id)){
@@ -70,7 +81,6 @@ class Validations {
         }
     }
 
-    //ok
     static validateDelete(id: string){
         if(!this.validateId(id)){
             throw new Error("Id parameter must be a number");
