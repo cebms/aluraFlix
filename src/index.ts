@@ -1,14 +1,12 @@
 import express from 'express';
 
 import routes from './routes';
-import authConfig from './authentication/authConfig';
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded());
 
-//authConfig(app);
 
 app.use(routes);
 
