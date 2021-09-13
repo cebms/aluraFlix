@@ -12,7 +12,7 @@ class CategoriesController {
             Validations.validateCreate(request.body);
             const id = await categoryModel.insert(request.body);
             return response.status(201).json({id, title, color});
-        } catch (error) {
+        } catch (error: any) {
             response.status(400).json({message: error.message});
         }
     }
@@ -25,7 +25,7 @@ class CategoriesController {
             const offset = (validatedPage - 1) * 5;
             const categories = await categoryModel.getAllCategories(offset);
             return response.status(200).json(categories);
-        } catch (error) {
+        } catch (error: any) {
             response.status(400).json({message: error.message});
         }
     }
@@ -43,7 +43,7 @@ class CategoriesController {
             } else {
                 return response.status(404).json({message: "category not found"});
             }
-        } catch (error) {
+        } catch (error: any) {
             response.status(400).json({message: error.message});
         }
 
@@ -62,7 +62,7 @@ class CategoriesController {
             } else {
                 return response.status(400).json({message: 'cannot find category with requested id'});
             }
-        } catch (error) {
+        } catch (error: any) {
             response.status(400).json({message: error.message});
         }
     }
@@ -82,7 +82,7 @@ class CategoriesController {
             categoryModel.update({...request.body, id}, categoryData);
 
             return response.status(201).json({message: 'resource updated'});
-        } catch (error) {
+        } catch (error: any) {
             response.status(400).json({message: error.message});
         }
     }

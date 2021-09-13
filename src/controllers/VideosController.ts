@@ -12,7 +12,7 @@ class VideosController {
             const offset = (validatedPage - 1) * 5;
             const videos = await videoModel.getAllVideos(search, offset);
             return response.status(200).json(videos); 
-        } catch (error) {
+        } catch (error: any) {
             response.status(400).json({message: error.message});
         }
 
@@ -41,7 +41,7 @@ class VideosController {
                 return response.status(404).json({message: "video not found"});
             }
 
-        } catch (error) {
+        } catch (error: any) {
             response.status(400).json({message: error.message});
         }
     }
@@ -58,7 +58,7 @@ class VideosController {
             await Validations.validateCreate(request.body);
             const id = await videoModel.insert(request.body);
             return response.status(201).json({id, title, description, url, category});
-        } catch (error) {
+        } catch (error: any) {
             response.status(400).json({message: error.message});
         }
         
@@ -77,7 +77,7 @@ class VideosController {
             } else {
                 return response.status(400).json({message: 'cannot find video with requested id'});
             }
-        } catch (error) {
+        } catch (error: any) {
             return response.status(400).json({message: error.message});
         }
 
@@ -99,7 +99,7 @@ class VideosController {
             videoModel.update({...request.body, id}, videoData);
 
             return response.status(201).json({message: 'resource updated'});
-        } catch (error) {
+        } catch (error: any) {
             response.status(400).json({message: error.message});
         }
         
